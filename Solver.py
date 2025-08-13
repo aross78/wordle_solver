@@ -1,37 +1,51 @@
-from itertools import permutations, product
+from itertools import product
 
 class Solver:
     def __init__(self):
-        #self.sln = [""] * 5
-        self.sln = ["", "", "m", "a", ""]
-        #self.yellows = {} # dict of format {index: {invalid chars}}
-        self.yellows = {4: {"m, n"}}
+        self.abc = set("abcdefghijklmnopqrstuvwxyz")
+        self.viable_letters = [ set(self.abc) for _ in range(5) ]
+
+        self.sln = [""] * 5
+        self.yellows = {} # dict of format {letter: (invalid positions)}          
         self.grays = set()
-        self.viable_letters = set("abcdefghijklmnopqrstuvwxyz")
-        self.dict = self.set_dict()
 
-    def get_possible_guesses(self):
-        possible_solutions = set()
-        unknowns = self.sln.count("")
-        if unknowns == 0:
-            return {''.join(self.sln)}
+        #self.sln = ["", "", "m", "a", ""] #for testing
+        #self.yellows = {'m': {4}, 'n':{4}} #for testing
+        #self.grays = set("cre") #testing
         
-        # Generate all permutations of the current solution
-        self.get_permutations()
+        self.dict = self.init_dict("solver/curated_words.txt")
 
-        # More code here
-        return
+    def update_viable_letters(self):
+        # Handle greens
+        for i in range(5):
+            # If we have a letter at that pos in sln, it's the only possible letter at that index
+            if self.sln[i]:
+                self.viable_letters[i] = set(self.sln[i])
+
+        # Handle yellows
+        for letter, invalids in self.yellows.items():
+            for i in invalids:
+                self.viable_letters[i].remove(letter)
+        
+        # Handle grays
+        for i in range(5):
+            self.viable_letters[i] -= self.grays
     
-    def get_permutations(self):
-       # Magic
-       return
+        return
 
-    def set_dict(self, file_path="wordle_solver/curated_words.txt"):
+    def get_guesses(self):
+        guesses = set()
+        for p in product(*self.viable_letters):
+           w = "".join(p)
+           if w in self.dict:
+               guesses.add(w)
+        return guesses
+
+    def init_dict(self, file_path="curated_words.txt"):
         with open(file_path, 'r') as file:
             return { line.strip() for line in file.readlines() }
-
-    def get_dict(self):
-        return self.dict
         
 # Testing
 a = Solver()
+a.update_viable_letters()
+a.get_guesses()
