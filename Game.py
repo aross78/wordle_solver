@@ -36,9 +36,10 @@ class Game:
             return choice([line.strip() for line in file])
         
     def solve(self):
-        solver = Solver(self)
+        solver = Solver(self) # this feels illegal
         # Magic
         return
-        
-a = Game("ovals")
-print(a.score_guess("boots"))
+
+# Testing 
+# a = Game("ovals")
+# print(a.score_guess("boots"))

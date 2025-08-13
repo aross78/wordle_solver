@@ -1,33 +1,42 @@
-import itertools
+from Game import Game
+from Solver import Solver
 
-included = "er"
-excluded = "bchmowsnvpal"
-abc = "abcdefghijklmnopqrstuvwxyz"
-for l in excluded:
-    abc = abc.replace(l, "")
+def get_todays_word():
+    from datetime import datetime as dt
+    import requests
 
-with open('solver\english.txt', 'r') as file:
-    # Convert repo file to iterable
-    lines = file.readlines()
-    string_set = { line.strip() for line in lines }
+    url = f"https://www.nytimes.com/svc/wordle/v2/{dt.now().strftime("%Y-%m-%d")}.json"
+    resp = requests.get(url, timeout=10)
+    resp.raise_for_status()
+    return resp.json()['solution']
+    
+########################################
 
-    # This part's the definition of brute force :-)
-    possible_solutions = set()
-    for first in abc:
-        for second in abc:
-            for third in abc:
-                possible_letters = included + first + second + third
+menu = """
+        1. Play today's wordle
+        2. Play a randomly-generated game 
+        3. Play with unknown sln
+        4. Play with a chosen word
+        """
 
-                # Given a string, returns iterator of all permutations of that string ... 
-                options = [ "".join(p) for p in itertools.permutations(possible_letters) ]
+print("Welcome to Wordle Solver")
+choice = int(input(menu))
 
-                # Keep permutations that are valid english words
-                for o in options:
-                    if o in string_set:
-                        possible_solutions.add(o)
+if choice == 1:
+    game = Game(get_todays_word())
+elif choice == 2:
+    game = Game()
+elif choice == 3:
+    game = None
+else:
+    s = input("Choose sln: ").lower()
+    game = Game(s)
 
-    # Additional filtering
-    possible_solutions -= {o for o in possible_solutions 
-                 if o[1] != 'e' or o[2] == 'r' or o[3] == 'r' or o.count('e') > 1}
+solver = Solver(game)
+round = 1
+while solver.is_unsolved():
+    print(f"Round {round}")
+    guess = input("Guess: ").lower()
+    solver.submit_guess(guess)
 
-    print(possible_solutions)
+    round += 1

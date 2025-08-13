@@ -12,11 +12,12 @@ class Solver:
 
         self.game = game
 
-        #self.sln = ["", "", "m", "a", ""] #for testing
-        #self.yellows = {'m': {4}, 'n':{4}} #for testing
-        #self.blacks = set("cre") #testing
+        # For testing
+        #self.sln = ["", "", "m", "a", ""]
+        #self.yellows = {'m': {4}, 'n':{4}}
+        #self.blacks = set("cre")
         
-        self.dict = self.init_dict("solver/curated_words.txt")
+        self.dict = set(self.init_dict("curated_words.txt"))
 
     def update_viable_letters(self):
         # Handle greens
@@ -28,12 +29,16 @@ class Solver:
         # Handle yellows
         for letter, invalids in self.yellows.items():
             for i in invalids:
-                self.viable_letters[i].remove(letter)
+                self.viable_letters[i].discard(letter)
         
         # Handle grays
         for i in range(5):
             self.viable_letters[i] -= self.blacks
     
+        return
+    
+    def order_by_freq(words):
+        
         return
 
     def get_guesses(self):
@@ -44,18 +49,46 @@ class Solver:
                guesses.add(w)
         return guesses
     
-    def make_guess(self, guess):
+    def submit_guess(self, guess):
         if self.game:
             result = self.game.score_guess(guess)
-        # Magic
+        else:
+            result = input(f"Input result in format \"gybbg\" where g: green, y: yellow, b: black for guess \"{guess}\": ")
+
+        for i in range(5):
+            c = guess[i]
+            score = result[i]
+
+            if score == "g":
+                self.sln[i] = c
+            
+            elif score == "y":
+                self.yellows.setdefault(c, set())
+                self.yellows[c].add(i)
+
+            else:
+                self.blacks.add(c)
+        
+        self.update_viable_letters()
+        print(f"Blacks: {self.blacks}, yellows: {self.yellows}, greens: {self.sln}")
+        print(f"By posn: { [ print(r) for r in self.viable_letters ]}")
+        
+        if not self.sln.count(""):
+            w = "".join(self.sln)
+            print(f"The solution is {w}")
+        else:
+            next_guesses = self.get_guesses()
+            print(f"Possible next guesses in order: {next_guesses}")
         return
+    
+    def is_unsolved(self):
+        return self.sln.count("")
 
-
-    def init_dict(self, file_path="curated_words.txt"):
+    def init_dict(self, file_path="curated_sorted.txt"):
         with open(file_path, 'r') as file:
-            return { line.strip() for line in file.readlines() }
+            return [ line.strip() for line in file.readlines() ]
         
 # Testing
-a = Solver()
-a.update_viable_letters()
-a.get_guesses()
+# a = Solver()
+# a.update_viable_letters()
+# a.get_guesses()
