@@ -1,7 +1,7 @@
 import itertools
 
-included = "nam"
-excluded = "crehu"
+included = "er"
+excluded = "bchmowsnvpal"
 abc = "abcdefghijklmnopqrstuvwxyz"
 for l in excluded:
     abc = abc.replace(l, "")
@@ -15,18 +15,19 @@ with open('solver\english.txt', 'r') as file:
     possible_solutions = set()
     for first in abc:
         for second in abc:
-            possible_letters = included + first + second
+            for third in abc:
+                possible_letters = included + first + second + third
 
-            # Given a string, returns iterator of all permutations of that string ... 
-            options = [ "".join(p) for p in itertools.permutations(possible_letters) ]
+                # Given a string, returns iterator of all permutations of that string ... 
+                options = [ "".join(p) for p in itertools.permutations(possible_letters) ]
 
-            # Keep permutations that are valid english words
-            for o in options:
-                if o in string_set:
-                    possible_solutions.add(o)
+                # Keep permutations that are valid english words
+                for o in options:
+                    if o in string_set:
+                        possible_solutions.add(o)
 
     # Additional filtering
     possible_solutions -= {o for o in possible_solutions 
-                 if o[4] in {'m', 'n'} or o[3] != 'a'or o[2] != 'm'}
+                 if o[1] != 'e' or o[2] == 'r' or o[3] == 'r' or o.count('e') > 1}
 
     print(possible_solutions)
