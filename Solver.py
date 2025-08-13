@@ -1,17 +1,20 @@
 from itertools import product
+import Game
 
 class Solver:
-    def __init__(self):
+    def __init__(self, game=None):
         self.abc = set("abcdefghijklmnopqrstuvwxyz")
         self.viable_letters = [ set(self.abc) for _ in range(5) ]
 
         self.sln = [""] * 5
         self.yellows = {} # dict of format {letter: (invalid positions)}          
-        self.grays = set()
+        self.blacks = set()
+
+        self.game = game
 
         #self.sln = ["", "", "m", "a", ""] #for testing
         #self.yellows = {'m': {4}, 'n':{4}} #for testing
-        #self.grays = set("cre") #testing
+        #self.blacks = set("cre") #testing
         
         self.dict = self.init_dict("solver/curated_words.txt")
 
@@ -29,7 +32,7 @@ class Solver:
         
         # Handle grays
         for i in range(5):
-            self.viable_letters[i] -= self.grays
+            self.viable_letters[i] -= self.blacks
     
         return
 
@@ -40,6 +43,13 @@ class Solver:
            if w in self.dict:
                guesses.add(w)
         return guesses
+    
+    def make_guess(self, guess):
+        if self.game:
+            result = self.game.score_guess(guess)
+        # Magic
+        return
+
 
     def init_dict(self, file_path="curated_words.txt"):
         with open(file_path, 'r') as file:
