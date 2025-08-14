@@ -17,7 +17,7 @@ class Solver:
         #self.yellows = {'m': {4}, 'n':{4}}
         #self.blacks = set("cre")
         
-        self.dict = set(self.init_dict("curated_words.txt"))
+        self.dict = self.init_dict()
 
     def update_viable_letters(self):
         # Handle greens
@@ -36,25 +36,25 @@ class Solver:
             self.viable_letters[i] -= self.blacks
     
         return
-    
-    def order_by_freq(words):
-        
-        return
 
+    # Returns list of guesses sorted by value in self.dict
     def get_guesses(self):
-        guesses = set()
+        guesses = {}
         for p in product(*self.viable_letters):
            w = "".join(p)
-           if w in self.dict:
-               guesses.add(w)
-        return guesses
+           if w in self.dict.keys():
+               guesses[w] = self.dict[w]
+        
+        return sorted(guesses.items(), key=lambda item: item[1])
     
+    # Interfaces with Game to submit a guess and then update solver's internal model of viable letters
     def submit_guess(self, guess):
         if self.game:
             result = self.game.score_guess(guess)
         else:
             result = input(f"Input result in format \"gybbg\" where g: green, y: yellow, b: black for guess \"{guess}\": ")
 
+        # Update "greens", yellows, and blacks tracking according to response received
         for i in range(5):
             c = guess[i]
             score = result[i]
@@ -69,16 +69,18 @@ class Solver:
             else:
                 self.blacks.add(c)
         
+        # Update model
         self.update_viable_letters()
         print(f"Blacks: {self.blacks}, yellows: {self.yellows}, greens: {self.sln}")
         print(f"By posn: { [ print(r) for r in self.viable_letters ]}")
         
+        # Report sln found if that's the case else recommend guesses
         if not self.sln.count(""):
             w = "".join(self.sln)
             print(f"The solution is {w}")
         else:
             next_guesses = self.get_guesses()
-            print(f"Possible next guesses in order: {next_guesses}")
+            print(f"Possible next guesses in order: {[w[0] for w in next_guesses]}")
         return
     
     def is_unsolved(self):
@@ -86,7 +88,8 @@ class Solver:
 
     def init_dict(self, file_path="curated_sorted.txt"):
         with open(file_path, 'r') as file:
-            return [ line.strip() for line in file.readlines() ]
+            return { line[1].strip() : line[0] for line in enumerate(file) }
+            #return [ line.strip() for line in file.readlines() ] #orig
         
 # Testing
 # a = Solver()
