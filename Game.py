@@ -7,7 +7,7 @@ class Game:
             self.sln = sln
         else:
             self.sln = self.get_random_sln()
-        print(f"Initiated with sln {self.sln}")
+        #print(f"Initiated with sln {self.sln}")
 
     def score_guess(self, guess):
         yellow_budget = { c : self.sln.count(c) for c in self.sln } # {letter: count}
