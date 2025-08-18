@@ -43,7 +43,11 @@ class Solver:
         for p in product(*self.viable_letters):
            w = "".join(p)
            if w in self.dict.keys():
-               guesses[w] = self.dict[w]
+               # check if all yellows and greens are a subset of the word
+               # prob going to check this in a way at first where I haven't thought abt edge cases
+                if set(self.yellows.keys()).issubset(set(w)):
+                    # 'copy' to our guesses dict
+                    guesses[w] = self.dict[w]
         
         return sorted(guesses.items(), key=lambda item: item[1])
     
