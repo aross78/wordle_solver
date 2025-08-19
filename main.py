@@ -30,6 +30,8 @@ elif choice == 3:
     game = None
 else:
     s = input("Choose sln: ").lower()
+    while len(s) != 5:
+        s = input("Choose a 5-letter sln: ").lower()
     game = Game(s)
 
 solver = Solver(game)
