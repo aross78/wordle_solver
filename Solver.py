@@ -48,8 +48,8 @@ class Solver:
                 result = input(f"Input 5-char result in format \"gybbg\" where g: green, y: yellow, b: black for guess \"{guess}\": ")
 
         # Update "greens", yellows, and blacks tracking according to response
-        # Does not currently handle 2 yellows of the same letter properly
-        # Or one green, one black of same letter in same guess
+        # Does not currently handle 2 yellows of the same letter rigorously
+        # nor one green, one black of same letter in same guess
         # Or a lot of other edge cases...
         for i in range(5):
             c = guess[i]
@@ -79,6 +79,10 @@ class Solver:
                     for pos in range(5):
                         if self.sln[pos] != c:
                             self.viable_letters[pos].discard(c)
+                
+                if guess[i:].count(c) > 1:
+                    appears_elsewhere = True
+                    self.viable_letters[i].discard(c)
                     
                 if not appears_elsewhere:
                     self.blacks.add(c)
