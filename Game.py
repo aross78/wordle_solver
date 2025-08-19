@@ -22,6 +22,13 @@ class Game:
                 if not yellow_budget[c]:
                     response.append("b")
                     continue
+
+                # Guessed letter more times than it appears
+                # Letter may be guessed at correct index later in word
+                if guess[i:].count(c) > yellow_budget[c]:
+                    response.append("b")
+                    continue
+
                 yellow_budget[c] -= 1
                 response.append("y")
             else:
