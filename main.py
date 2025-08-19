@@ -37,6 +37,8 @@ round = 1
 while solver.is_unsolved():
     print(f"Round {round}")
     guess = input("Guess: ").lower()
+    while len(guess) != 5:
+        guess = input("Guess must be 5 letters: ").lower()
     solver.submit_guess(guess)
 
     round += 1
