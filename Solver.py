@@ -23,7 +23,7 @@ class Solver:
         Based on remaining viable letters, 
         Returns list of format [(guess, frequency)] sorted by freq defined in self.dict
         """
-        guesses = {}
+        guesses = set()
         for p in product(*self.viable_letters):
            w = "".join(p)
            if w in self.dict.keys():
@@ -31,9 +31,32 @@ class Solver:
                 # Have not thought through edge cases nor considered more efficient approaches
                 # The blacks check should be able to be done implicitly too I think
                 if set(self.yellows.keys()).issubset(set(w)):
-                    guesses[w] = self.dict[w]
+                    guesses.add(w)
 
+        guesses = { w : self.dict[w] for w in guesses }
         return sorted(guesses.items(), key=lambda item: item[1])
+
+    
+    def suggest_guess(self, guesses:list):
+        """
+        Suggests a guess by the following algorithm:
+        1. Of viable guesses, look at the 20 or 25% "most common" words
+        2. Determine which letters appear the most in those words
+        3. Return guesses, if any, that include the five most common letters
+        ...In attempt to eliminate as many remaining guesses as possible
+        """
+        common_letters = { l : 0 for l in ABC}
+        top = 20 if len(guesses) >= 20 else int(len(guesses) * .25)
+        for w in guesses[:top]:
+            for l in w:
+                common_letters[l] += w.count(l)
+
+        common_letters = sorted(common_letters.items(), key=lambda item: item[1], reverse=True)
+        most_common_letters = set([ i[0] for i in common_letters[:5] ])
+        words_w_all_5_letters = [ w for w in guesses if set(w) == most_common_letters ]
+        print(f"Suggested guesses: {words_w_all_5_letters}")
+
+        return words_w_all_5_letters
     
     def submit_guess(self, guess):
         """
@@ -96,7 +119,9 @@ class Solver:
         if not self.is_unsolved():
             print(f"The solution is {"".join(self.sln).upper()}")
         else:
-            print(f"Possible next guesses in order: {[w[0] for w in self.get_guesses()]}")
+            guesses = [w[0] for w in self.get_guesses()]
+            print(f"Possible next guesses in order: {guesses}")
+            self.suggest_guess(guesses)
         return
     
     
