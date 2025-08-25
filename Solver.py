@@ -48,7 +48,7 @@ class Solver:
         common_letters = { l : 0 for l in ABC}
         top = 20 if len(guesses) >= 20 else int(len(guesses) * .25)
         for w in guesses[:top]:
-            for l in w:
+            for l in set(w):
                 common_letters[l] += w.count(l)
 
         common_letters = sorted(common_letters.items(), key=lambda item: item[1], reverse=True)
@@ -58,6 +58,7 @@ class Solver:
 
         return words_w_all_5_letters
     
+
     def submit_guess(self, guess):
         """
         Interfaces with Game to submit a guess
