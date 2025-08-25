@@ -44,4 +44,4 @@ while solver.is_unsolved():
     solver.submit_guess(guess)
 
     round += 1
-print(f"Solved in {round}.")
+print(f"Solved in {round - 1}.")
